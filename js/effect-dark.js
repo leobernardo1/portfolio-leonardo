@@ -77,6 +77,28 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeFinisherHeader(false); // Tema claro
         profileImg.src = 'images/profile-light.png'; // Imagem para tema claro
     }
+
+    // Adiciona scroll suave aos links da navbar e do footer
+    const allNavLinks = document.querySelectorAll('.nav-links a, .footer-links a[href^="#"]');
+    allNavLinks.forEach(link => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault(); // Impede o comportamento padrão de salto imediato
+            const targetId = link.getAttribute('href'); // Pega o ID da seção (ex.: #about)
+            const targetSection = document.querySelector(targetId); // Seleciona a seção
+            
+            // Scroll suave até a seção
+            targetSection.scrollIntoView({
+                behavior: 'smooth', // Efeito suave
+                block: 'start' // Alinha o topo da seção ao topo da janela
+            });
+
+            // Fecha o menu mobile após o clique (se estiver aberto)
+            if (navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                mobileMenu.textContent = '☰';
+            }
+        });
+    });
 });
 
 // Adiciona evento ao botão de tema
