@@ -20,9 +20,9 @@ function initializeFinisherHeader(isDark) {
         "colors": {
             "background": isDark ? "#151d2e" : "#e4edf2",
             "particles": [
-                "#ff03ec", // Rosa vibrante
-                "#00a5e6", // Azul claro
-                "#67f0d5"  // Verde azulado
+                "#ff03ec",
+                "#00a5e6",
+                "#67f0d5"
             ]
         },
         "blending": "overlay",
@@ -34,7 +34,6 @@ function initializeFinisherHeader(isDark) {
         "shapes": ["c"]
     });
 
-    // Aplica a transparência ao elemento após a inicialização
     document.querySelector('.finisher-header').style.backgroundColor = isDark ? 'rgba(21, 29, 46, 0.4)' : 'rgba(228, 237, 242, 0.5)';
 }
 
@@ -45,6 +44,8 @@ const backToTopButton = document.getElementById('back-to-top');
 const mobileMenu = document.querySelector('.mobile-menu');
 const navLinks = document.querySelector('.nav-links');
 const profileImg = document.getElementById('profile-img');
+const contactForm = document.getElementById('contact-form');
+const formMessage = document.getElementById('form-message');
 
 // Função para alternar o tema e a imagem do perfil
 function toggleTheme() {
@@ -52,14 +53,14 @@ function toggleTheme() {
         htmlElement.classList.remove('dark');
         themeToggle.textContent = '🌙';
         localStorage.setItem('theme', 'light');
-        initializeFinisherHeader(false); // Tema claro
-        profileImg.src = 'images/profile-light.png'; // Imagem para tema claro
+        initializeFinisherHeader(false);
+        profileImg.src = 'images/profile-light.png';
     } else {
         htmlElement.classList.add('dark');
         themeToggle.textContent = '☀️';
         localStorage.setItem('theme', 'dark');
-        initializeFinisherHeader(true); // Tema escuro
-        profileImg.src = 'images/profile-dark.png'; // Imagem para tema escuro
+        initializeFinisherHeader(true);
+        profileImg.src = 'images/profile-dark.png';
     }
 }
 
@@ -69,34 +70,65 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedTheme === 'dark') {
         htmlElement.classList.add('dark');
         themeToggle.textContent = '☀️';
-        initializeFinisherHeader(true); // Tema escuro
-        profileImg.src = 'images/profile-dark.png'; // Imagem para tema escuro
+        initializeFinisherHeader(true);
+        profileImg.src = 'images/profile-dark.png';
     } else {
         htmlElement.classList.remove('dark');
         themeToggle.textContent = '🌙';
-        initializeFinisherHeader(false); // Tema claro
-        profileImg.src = 'images/profile-light.png'; // Imagem para tema claro
+        initializeFinisherHeader(false);
+        profileImg.src = 'images/profile-light.png';
     }
 
     // Adiciona scroll suave aos links da navbar e do footer
     const allNavLinks = document.querySelectorAll('.nav-links a, .footer-links a[href^="#"]');
     allNavLinks.forEach(link => {
         link.addEventListener('click', (event) => {
-            event.preventDefault(); // Impede o comportamento padrão de salto imediato
-            const targetId = link.getAttribute('href'); // Pega o ID da seção (ex.: #about)
-            const targetSection = document.querySelector(targetId); // Seleciona a seção
-            
-            // Scroll suave até a seção
+            event.preventDefault();
+            const targetId = link.getAttribute('href');
+            const targetSection = document.querySelector(targetId);
             targetSection.scrollIntoView({
-                behavior: 'smooth', // Efeito suave
-                block: 'start' // Alinha o topo da seção ao topo da janela
+                behavior: 'smooth',
+                block: 'start'
             });
-
-            // Fecha o menu mobile após o clique (se estiver aberto)
             if (navLinks.classList.contains('active')) {
                 navLinks.classList.remove('active');
                 mobileMenu.textContent = '☰';
             }
+        });
+    });
+
+    // Envio do formulário via AJAX
+    contactForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Impede o envio padrão
+
+        const formData = new FormData(contactForm);
+        formData.append('_subject', 'Nova mensagem do portfólio'); // Assunto do e-mail
+        formData.append('_captcha', 'false'); // Desativa CAPTCHA
+
+        fetch('https://formsubmit.co/leo.bernardo.3@gmail.com', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => {
+            if (response.ok) {
+                formMessage.style.display = 'block';
+                formMessage.style.color = '#079bf1'; // Azul claro pra sucesso
+                formMessage.textContent = 'Mensagem enviada com sucesso!';
+                contactForm.reset(); // Limpa o formulário
+                setTimeout(() => {
+                    formMessage.style.display = 'none'; // Esconde a mensagem após 3s
+                }, 3000);
+            } else {
+                throw new Error('Erro ao enviar');
+            }
+        })
+        .catch(error => {
+            formMessage.style.display = 'block';
+            formMessage.style.color = '#ff0000'; // Vermelho pra erro
+            formMessage.textContent = 'Erro ao enviar a mensagem. Tente novamente.';
+            setTimeout(() => {
+                formMessage.style.display = 'none';
+            }, 3000);
         });
     });
 });
@@ -106,7 +138,7 @@ themeToggle.addEventListener('click', toggleTheme);
 
 // Mostrar/esconder botão "Voltar ao Início" ao rolar
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) { // Aparece após rolar 300px
+    if (window.scrollY > 300) {
         backToTopButton.style.display = 'block';
     } else {
         backToTopButton.style.display = 'none';
@@ -121,5 +153,5 @@ backToTopButton.addEventListener('click', () => {
 // Toggle do menu mobile
 mobileMenu.addEventListener('click', () => {
     navLinks.classList.toggle('active');
-    mobileMenu.textContent = navLinks.classList.contains('active') ? '✖' : '☰'; // Alterna entre "☰" e "✖"
+    mobileMenu.textContent = navLinks.classList.contains('active') ? '✖' : '☰';
 });
